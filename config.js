@@ -1,0 +1,1 @@
+window.VITALSITE_EMAIL = 'vitalsite7@gmail.com';

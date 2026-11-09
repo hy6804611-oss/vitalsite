@@ -3,16 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f172a">
   <title>YusufLang Builder - Vitalsite</title>
   <link rel="stylesheet" href="style.css">
   <style>
     .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; }
-    textarea { width: 100%; height: 340px; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0b1220; color: #4ade80; font-family: Consolas, monospace; font-size: 0.95rem; resize: vertical; }
-    iframe { width: 100%; height: 340px; border: 1px solid #334155; border-radius: 10px; background: #fff; }
+    textarea { width: 100%; height: 440px; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0b1220; color: #4ade80; font-family: Consolas, monospace; font-size: 0.95rem; resize: vertical; }
+    iframe { width: 100%; height: 440px; border: 1px solid #334155; border-radius: 10px; background: #fff; }
     .label { margin: 0 0 6px; font-weight: bold; color: #94a3b8; }
     #errors { margin-top: 12px; padding: 12px; border-radius: 8px; background: #7f1d1d; white-space: pre-wrap; font-size: 0.9rem; }
+    #lock-msg { margin-top: 12px; padding: 12px; border-radius: 8px; background: #422006; font-size: 0.9rem; }
     .help { background: #1e293b; border-radius: 10px; padding: 14px; margin-top: 20px; color: #94a3b8; font-size: 0.9rem; }
     .help code { color: #38bdf8; }
+    .help table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .help td { padding: 6px 4px; border-top: 1px solid #263449; vertical-align: top; }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .badge { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; background: #38bdf8; color: #0f172a; margin-left: 6px; vertical-align: middle; }
   </style>
 </head>
 <body>
@@ -21,39 +27,99 @@
     <nav>
       <a href="/">Scanner</a>
       <a href="/builder.html">Builder</a>
+      <a href="#builder-pricing">Pricing</a>
     </nav>
   </header>
   <main>
     <section class="hero">
       <h1>YusufLang Builder</h1>
-      <p class="tagline">Write simple commands. See your app appear instantly.</p>
+      <p class="tagline">Write simple words. Get a working app with screens and buttons. No AI, just a simple language that follows your rules.</p>
     </section>
+
     <div class="wrap">
       <div>
         <p class="label">Your YusufLang code</p>
-        <textarea id="code" spellcheck="false">app "My Shop"
-background "#0f172a"
-accent "#38bdf8"
-title "Welcome to My Shop"
-text "Best prices in town"
-divider
-input "Your email"
-button "Join now"</textarea>
+        <textarea id="code" spellcheck="false"></textarea>
       </div>
       <div>
-        <p class="label">Live preview</p>
-        <iframe id="preview" sandbox=""></iframe>
+        <p class="label">Live app preview (tap the buttons!)</p>
+        <iframe id="preview" sandbox="allow-scripts allow-popups"></iframe>
       </div>
     </div>
+
     <div id="errors" class="hidden"></div>
-    <div class="help">
-      <b>Commands:</b>
-      <code>app "name"</code>, <code>background "#color"</code>, <code>accent "#color"</code>,
-      <code>title "text"</code>, <code>text "text"</code>, <code>input "placeholder"</code>,
-      <code>button "label"</code>, <code>divider</code>. Lines starting with # are notes.
+
+    <div class="toolbar">
+      <button type="button" id="reset-btn" class="secondary">Reset example</button>
+      <button type="button" id="export-btn">Export app <span class="badge">PRO</span></button>
     </div>
+    <div id="lock-msg" class="hidden">Exporting your app as a file is a Pro feature. Pro is coming soon. Email us if you want early access.</div>
+
+    <div class="help">
+      <b>Commands</b>
+      <table>
+        <tr><td><code>app "Name"</code></td><td>Name of your app</td></tr>
+        <tr><td><code>theme dark</code> or <code>theme light</code></td><td>Dark or light style</td></tr>
+        <tr><td><code>accent "#38bdf8"</code></td><td>Main color (buttons, titles)</td></tr>
+        <tr><td><code>background "#0f172a"</code></td><td>Background color</td></tr>
+        <tr><td><code>screen Home</code></td><td>Start a new screen. Everything under it belongs to that screen. Use letters or numbers only, no spaces.</td></tr>
+        <tr><td><code>title "text"</code></td><td>Big heading</td></tr>
+        <tr><td><code>text "text"</code></td><td>Paragraph</td></tr>
+        <tr><td><code>input "placeholder"</code></td><td>Text box</td></tr>
+        <tr><td><code>button "Label" goto Products</code></td><td>Button that opens another screen (goto part is optional)</td></tr>
+        <tr><td><code>link "Label" "https://..."</code></td><td>Link to a website</td></tr>
+        <tr><td><code>image "https://..."</code></td><td>Picture from a web address</td></tr>
+        <tr><td><code>list "One", "Two", "Three"</code></td><td>Bullet list</td></tr>
+        <tr><td><code>card "Title" "Text"</code></td><td>Box with a title and text</td></tr>
+        <tr><td><code>divider</code></td><td>Line between things</td></tr>
+        <tr><td><code># note</code></td><td>A note to yourself. Ignored.</td></tr>
+      </table>
+    </div>
+
+    <section id="builder-pricing">
+      <h2>Builder pricing</h2>
+      <p class="sub">Build and preview free. Pay only when you want to keep and share your apps.</p>
+      <div class="grid">
+        <div class="card plan">
+          <h3>Free</h3>
+          <div class="price">&#36;0</div>
+          <ul>
+            <li>Write and preview apps</li>
+            <li>Unlimited screens</li>
+            <li>Saved on this device</li>
+          </ul>
+          <a class="cta" href="#code">Start building</a>
+        </div>
+        <div class="card plan featured">
+          <h3>Pro</h3>
+          <div class="price">&#36;9<small>/month</small></div>
+          <ul>
+            <li>Export your app as a file</li>
+            <li>Save projects online</li>
+            <li>Extra commands first</li>
+          </ul>
+          <span class="cta disabled">Coming soon</span>
+        </div>
+        <div class="card plan">
+          <h3>Team</h3>
+          <div class="price">&#36;29<small>/month</small></div>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Shared projects</li>
+            <li>Priority support</li>
+          </ul>
+          <span class="cta disabled">Coming soon</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="hidden">
+      <h2>Contact us</h2>
+      <p class="center"><a id="contact-link" class="cta" href="#">Email us</a></p>
+    </section>
   </main>
-  <footer>YusufLang 0.1</footer>
+  <footer>YusufLang 0.2 &middot; Part of Vitalsite</footer>
+  <script src="config.js"></script>
   <script src="builder.js"></script>
 </body>
 </html>

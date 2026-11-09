@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f172a">
-  <meta name="description" content="Vitalsite checks your website for speed, security, mobile problems and broken links.">
+  <meta name="description" content="Vitalsite checks your website for speed, security, mobile problems and broken links, with clear fixes.">
   <title>Vitalsite - Website Health Check</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/icon-192.png">
@@ -16,8 +16,9 @@
     <div class="logo">Vital<span>site</span></div>
     <nav>
       <a href="#scan">Scan</a>
-      <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a><a href="/builder.html">Builder</a>
+      <a href="#tools">Password</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/builder.html">Builder</a>
       <button id="install" class="install hidden" type="button">Install app</button>
     </nav>
   </header>
@@ -37,6 +38,7 @@
       <div id="error" class="hidden"></div>
 
       <section id="result" class="hidden">
+        <div class="print-only"><h2>Vitalsite Website Health Report</h2><p id="print-date"></p></div>
         <div class="score-box">
           <div id="score" class="score">0</div>
           <div>
@@ -44,47 +46,69 @@
             <div id="meta" class="meta"></div>
           </div>
         </div>
+        <div class="actions">
+          <button type="button" id="print-btn" class="secondary">Save as PDF</button>
+          <button type="button" id="share-btn" class="secondary">Share on WhatsApp</button>
+        </div>
         <div id="checks"></div>
       </section>
+    </section>
+
+    <section id="history" class="hidden">
+      <h2>Recent scans</h2>
+      <div id="history-list"></div>
+      <p class="center"><button type="button" id="clear-history" class="secondary">Clear history</button></p>
     </section>
 
     <section id="features">
       <h2>What Vitalsite checks</h2>
       <div class="grid">
         <div class="card"><h3>&#9889; Speed</h3><p>How fast your website responds to visitors.</p></div>
-        <div class="card"><h3>&#128274; Security</h3><p>HTTPS and important security headers.</p></div>
+        <div class="card"><h3>&#128274; Security</h3><p>HTTPS, SSL certificate and security headers.</p></div>
         <div class="card"><h3>&#128241; Mobile</h3><p>Whether your page is set up for phones.</p></div>
         <div class="card"><h3>&#128279; Broken links</h3><p>Links that lead to errors or dead pages.</p></div>
-        <div class="card"><h3>&#9989; Availability</h3><p>Confirms your site is online and responding.</p></div>
-        <div class="card"><h3>&#128161; Clear advice</h3><p>Plain explanations of what needs fixing.</p></div>
+        <div class="card"><h3>&#128161; Clear fixes</h3><p>Plain advice for every problem found.</p></div>
+        <div class="card"><h3>&#128196; PDF reports</h3><p>Save a report to send to a client or boss.</p></div>
       </div>
+    </section>
+
+    <section id="tools">
+      <h2>Password breach check</h2>
+      <p class="sub">Find out if a password has appeared in known data leaks. Your password is never sent in full.</p>
+      <form id="pw-form">
+        <input id="pw" type="password" placeholder="Type a password to check" autocomplete="off" required>
+        <button id="pw-btn" type="submit">Check password</button>
+      </form>
+      <div id="pw-result" class="hidden"></div>
     </section>
 
     <section id="pricing">
       <h2>Pricing</h2>
       <p class="sub">Start free. Paid plans are coming soon.</p>
-      <div class="grid prices">
+      <div class="grid">
         <div class="card plan">
           <h3>Free</h3>
           <div class="price">&#36;0</div>
           <ul>
             <li>Basic website checks</li>
-            <li>Instant score</li>
+            <li>Instant score and fixes</li>
             <li>Limited scans</li>
           </ul>
           <a class="cta" href="#scan">Start scanning</a>
         </div>
         <div class="card plan featured">
-          <h3>Pro</h3><div class="price">&#36;9<small>/month</small></div>
+          <h3>Pro</h3>
+          <div class="price">&#36;9<small>/month</small></div>
           <ul>
             <li>More scans</li>
             <li>Detailed reports</li>
-            <li>Scan history</li>
+            <li>Builder: save and download apps</li>
           </ul>
           <span class="cta disabled">Coming soon</span>
         </div>
         <div class="card plan">
-          <h3>Team</h3><div class="price">&#36;29<small>/month</small></div>
+          <h3>Team</h3>
+          <div class="price">&#36;29<small>/month</small></div>
           <ul>
             <li>Shared projects</li>
             <li>Team reports</li>
@@ -94,9 +118,16 @@
         </div>
       </div>
     </section>
+
+    <section id="contact" class="hidden">
+      <h2>Contact us</h2>
+      <p class="sub">Questions or feedback? We reply as soon as we can.</p>
+      <p class="center"><a id="contact-link" class="cta" href="#">Email us</a></p>
+    </section>
   </main>
 
-  <footer>Vitalsite &middot; Built step by step &middot; Version 0.2</footer>
+  <footer>Vitalsite &middot; Version 0.3</footer>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

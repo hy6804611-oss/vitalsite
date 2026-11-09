@@ -3,10 +3,29 @@ const fs = require('fs');
 const path = require('path');
 const dns = require('dns').promises;
 const net = require('net');
+const tls = require('tls');
 
 const PORT = process.env.PORT || 3000;
-const PUBLIC_DIR = fs.existsSync(path.join(__dirname, 'public')) ? path.join(__dirname, 'public') : __dirname; const BLOCKED = ['server.js', 'package.json'];
-const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const PUBLIC_DIR = fs.existsSync(path.join(__dirname, 'public')) ? path.join(__dirname, 'public') : __dirname;
+const BLOCKED = ['server.js', 'package.json'];
+const TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml'
+};
+
+const hits = new Map();
+function limited(ip) {
+  const now = Date.now();
+  const list = (hits.get(ip) || []).filter(t => now - t < 600000);
+  list.push(now);
+  hits.set(ip, list);
+  return list.length > 15;
+}
+setInterval(() => hits.clear(), 3600000);
 
 function isPrivateIp(ip) {
   if (net.isIPv6(ip)) {
@@ -52,7 +71,7 @@ async function fetchSafe(url, method = 'GET', hops = 0) {
       method,
       redirect: 'manual',
       signal: ctrl.signal,
-      headers: { 'User-Agent': 'Vitalsite-Scanner/0.1' }
+      headers: { 'User-Agent': 'Vitalsite-Scanner/0.3' }
     });
     const loc = res.headers.get('location');
     if (res.status >= 300 && res.status < 400 && loc && hops < 5) {
@@ -69,6 +88,21 @@ function friendly(err) {
   if (err.name === 'AbortError') return 'The website took longer than 10 seconds to respond.';
   if (err.message === 'fetch failed') return 'Could not connect. The website may be down or blocking us.';
   return err.message;
+}
+
+async function sslInfo(hostname, port) {
+  const addrs = await dns.lookup(hostname, { all: true });
+  if (addrs.some(a => isPrivateIp(a.address))) throw new Error('private');
+  return new Promise((resolve, reject) => {
+    const socket = tls.connect({ host: addrs[0].address, port: port, servername: hostname, timeout: 8000 }, () => {
+      const cert = socket.getPeerCertificate();
+      const info = { validTo: cert.valid_to, authorized: socket.authorized, reason: socket.authorizationError };
+      socket.end();
+      resolve(info);
+    });
+    socket.on('timeout', () => { socket.destroy(); reject(new Error('timeout')); });
+    socket.on('error', reject);
+  });
 }
 
 async function scan(input) {
@@ -88,38 +122,52 @@ async function scan(input) {
 
   const checks = [];
   let score = 100;
-  const check = (name, status, detail) => {
-    checks.push({ name, status, detail });
+  const check = (id, name, status, detail) => {
+    checks.push({ id, name, status, detail });
     if (status === 'fail') score -= 15;
     if (status === 'warn') score -= 5;
   };
 
-  check('Website is online', res.status < 400 ? 'pass' : 'fail', 'Status code: ' + res.status);
-
-  check('Response speed', ms < 800 ? 'pass' : ms < 2000 ? 'warn' : 'fail', ms + ' ms to respond');
-
-  check('Uses HTTPS (secure connection)', finalUrl.protocol === 'https:' ? 'pass' : 'fail',
+  check('online', 'Website is online', res.status < 400 ? 'pass' : 'fail', 'Status code: ' + res.status);
+  check('speed', 'Response speed', ms < 800 ? 'pass' : ms < 2000 ? 'warn' : 'fail', ms + ' ms to respond');
+  check('https', 'Uses HTTPS (secure connection)', finalUrl.protocol === 'https:' ? 'pass' : 'fail',
     finalUrl.protocol === 'https:' ? 'Connection is encrypted' : 'Site loads without encryption');
 
+  if (finalUrl.protocol === 'https:' && !net.isIP(finalUrl.hostname)) {
+    try {
+      const s = await sslInfo(finalUrl.hostname, Number(finalUrl.port) || 443);
+      const days = Math.floor((new Date(s.validTo).getTime() - Date.now()) / 86400000);
+      if (!s.authorized || days < 0) {
+        check('ssl', 'SSL certificate', 'fail', s.reason ? 'Problem: ' + s.reason : 'Certificate expired');
+      } else if (days < 30) {
+        check('ssl', 'SSL certificate', 'warn', 'Expires in ' + days + ' days');
+      } else {
+        check('ssl', 'SSL certificate', 'pass', 'Valid. Expires in ' + days + ' days');
+      }
+    } catch (e) {
+      check('ssl', 'SSL certificate', 'warn', 'Could not read the certificate');
+    }
+  }
+
   const headers = [
-    ['strict-transport-security', 'HSTS'],
-    ['content-security-policy', 'Content Security Policy'],
-    ['x-frame-options', 'Clickjacking protection'],
-    ['x-content-type-options', 'MIME sniffing protection'],
-    ['referrer-policy', 'Referrer policy']
+    ['strict-transport-security', 'HSTS', 'hsts'],
+    ['content-security-policy', 'Content Security Policy', 'csp'],
+    ['x-frame-options', 'Clickjacking protection', 'xfo'],
+    ['x-content-type-options', 'MIME sniffing protection', 'xcto'],
+    ['referrer-policy', 'Referrer policy', 'referrer']
   ];
-  for (const [h, label] of headers) {
+  for (const [h, label, id] of headers) {
     const has = res.headers.has(h);
-    check('Security header: ' + label, has ? 'pass' : 'warn', has ? 'Present' : 'Missing header "' + h + '"');
+    check(id, 'Security header: ' + label, has ? 'pass' : 'warn', has ? 'Present' : 'Missing header "' + h + '"');
   }
 
   if (html) {
     const viewport = /<meta[^>]+name=["']viewport["']/i.test(html);
-    check('Mobile-friendly setup', viewport ? 'pass' : 'warn',
+    check('viewport', 'Mobile-friendly setup', viewport ? 'pass' : 'warn',
       viewport ? 'Viewport tag found' : 'No viewport meta tag. The page may look bad on phones.');
 
     const title = /<title[^>]*>([^<]+)<\/title>/i.exec(html);
-    check('Page title', title ? 'pass' : 'warn', title ? title[1].trim() : 'No <title> found');
+    check('title', 'Page title', title ? 'pass' : 'warn', title ? title[1].trim() : 'No <title> found');
 
     const links = new Set();
     const re = /href\s*=\s*["']([^"'#][^"']*)["']/gi;
@@ -141,7 +189,7 @@ async function scan(input) {
         broken.push(link + ' (no response)');
       }
     }));
-    check('Broken links (first 20 checked)', broken.length === 0 ? 'pass' : 'fail',
+    check('links', 'Broken links (first 20 checked)', broken.length === 0 ? 'pass' : 'fail',
       broken.length === 0 ? 'No broken links found among ' + links.size : broken.join('\n'));
   }
 
@@ -149,10 +197,18 @@ async function scan(input) {
 }
 
 const server = http.createServer(async (req, res) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   const reqUrl = new URL(req.url, 'http://localhost');
 
   if (reqUrl.pathname === '/api/check') {
     res.setHeader('Content-Type', 'application/json');
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    if (limited(ip)) {
+      res.statusCode = 429;
+      return res.end(JSON.stringify({ error: 'Too many scans. Please wait a few minutes and try again.' }));
+    }
     try {
       const target = (reqUrl.searchParams.get('url') || '').trim();
       if (!target) throw new Error('Please enter a website address.');
