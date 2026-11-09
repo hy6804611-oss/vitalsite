@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YusufLang Builder - Vitalsite</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; }
+    textarea { width: 100%; height: 340px; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0b1220; color: #4ade80; font-family: Consolas, monospace; font-size: 0.95rem; resize: vertical; }
+    iframe { width: 100%; height: 340px; border: 1px solid #334155; border-radius: 10px; background: #fff; }
+    .label { margin: 0 0 6px; font-weight: bold; color: #94a3b8; }
+    #errors { margin-top: 12px; padding: 12px; border-radius: 8px; background: #7f1d1d; white-space: pre-wrap; font-size: 0.9rem; }
+    .help { background: #1e293b; border-radius: 10px; padding: 14px; margin-top: 20px; color: #94a3b8; font-size: 0.9rem; }
+    .help code { color: #38bdf8; }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="logo">Vital<span>site</span></div>
+    <nav>
+      <a href="/">Scanner</a>
+      <a href="/builder.html">Builder</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <h1>YusufLang Builder</h1>
+      <p class="tagline">Write simple commands. See your app appear instantly.</p>
+    </section>
+    <div class="wrap">
+      <div>
+        <p class="label">Your YusufLang code</p>
+        <textarea id="code" spellcheck="false">app "My Shop"
+background "#0f172a"
+accent "#38bdf8"
+title "Welcome to My Shop"
+text "Best prices in town"
+divider
+input "Your email"
+button "Join now"</textarea>
+      </div>
+      <div>
+        <p class="label">Live preview</p>
+        <iframe id="preview" sandbox=""></iframe>
+      </div>
+    </div>
+    <div id="errors" class="hidden"></div>
+    <div class="help">
+      <b>Commands:</b>
+      <code>app "name"</code>, <code>background "#color"</code>, <code>accent "#color"</code>,
+      <code>title "text"</code>, <code>text "text"</code>, <code>input "placeholder"</code>,
+      <code>button "label"</code>, <code>divider</code>. Lines starting with # are notes.
+    </div>
+  </main>
+  <footer>YusufLang 0.1</footer>
+  <script src="builder.js"></script>
+</body>
+</html>
