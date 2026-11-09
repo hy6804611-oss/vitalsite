@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Vitalsite checks your website for speed, security, mobile problems and broken links.">
+  <title>Vitalsite - Website Health Check</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="logo">Vital<span>site</span></div>
+    <nav>
+      <a href="#scan">Scan</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <button id="install" class="install hidden" type="button">Install app</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="scan">
+      <h1>Is your website healthy?</h1>
+      <p class="tagline">Check speed, security, mobile setup and broken links in seconds. Get clear fixes, not confusing jargon.</p>
+
+      <form id="scan-form">
+        <input id="url" type="text" placeholder="example.com" autocomplete="off" required>
+        <button id="btn" type="submit">Check website</button>
+      </form>
+      <p class="note">Only scan websites you own or have permission to test.</p>
+
+      <div id="loading" class="hidden">Scanning... this can take up to 30 seconds.</div>
+      <div id="error" class="hidden"></div>
+
+      <section id="result" class="hidden">
+        <div class="score-box">
+          <div id="score" class="score">0</div>
+          <div>
+            <div id="site" class="site"></div>
+            <div id="meta" class="meta"></div>
+          </div>
+        </div>
+        <div id="checks"></div>
+      </section>
+    </section>
+
+    <section id="features">
+      <h2>What Vitalsite checks</h2>
+      <div class="grid">
+        <div class="card"><h3>&#9889; Speed</h3><p>How fast your website responds to visitors.</p></div>
+        <div class="card"><h3>&#128274; Security</h3><p>HTTPS and important security headers.</p></div>
+        <div class="card"><h3>&#128241; Mobile</h3><p>Whether your page is set up for phones.</p></div>
+        <div class="card"><h3>&#128279; Broken links</h3><p>Links that lead to errors or dead pages.</p></div>
+        <div class="card"><h3>&#9989; Availability</h3><p>Confirms your site is online and responding.</p></div>
+        <div class="card"><h3>&#128161; Clear advice</h3><p>Plain explanations of what needs fixing.</p></div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <h2>Pricing</h2>
+      <p class="sub">Start free. Paid plans are coming soon.</p>
+      <div class="grid prices">
+        <div class="card plan">
+          <h3>Free</h3>
+          <div class="price">&#36;0</div>
+          <ul>
+            <li>Basic website checks</li>
+            <li>Instant score</li>
+            <li>Limited scans</li>
+          </ul>
+          <a class="cta" href="#scan">Start scanning</a>
+        </div>
+        <div class="card plan featured">
+          <h3>Pro</h3><div class="price">&#36;9<small>/month</small></div>
+          <ul>
+            <li>More scans</li>
+            <li>Detailed reports</li>
+            <li>Scan history</li>
+          </ul>
+          <span class="cta disabled">Coming soon</span>
+        </div>
+        <div class="card plan">
+          <h3>Team</h3><div class="price">&#36;29<small>/month</small></div>
+          <ul>
+            <li>Shared projects</li>
+            <li>Team reports</li>
+            <li>Priority support</li>
+          </ul>
+          <span class="cta disabled">Coming soon</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Vitalsite &middot; Built step by step &middot; Version 0.2</footer>
+  <script src="app.js"></script>
+</body>
+</html>
